@@ -1,44 +1,31 @@
-import { useEffect, useState } from "react";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Routes,
+  Route,
+} from "react-router-dom";
 import "./App.css";
-const Url = import.meta.env.VITE_SERVER_URL;
-
-interface backendData {
-  users: string[]; // This means users is an array of strings
-}
+import AccountSetupPage from "./pages/AccountSetupPage";
 
 function App() {
-  const [backendData, setBackendData] = useState<backendData>({ users: [] });
-
-  useEffect(() => {
-    fetch(Url + "/api", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setBackendData(data);
-      });
-  }, []);
-
   return (
-    <>
-      <div>
-        <p>hello</p>
-        {typeof backendData.users === "undefined" ? (
-          <p>Loading...</p>
-        ) : (
-          backendData.users.map((user, i) => (
-            <p className="text-5xl font-black" key={i}>
-              {user}
-            </p>
-          ))
-        )}
-      </div>
-    </>
+    <div>
+      <Routes>
+        <Route path="/" element={<AccountSetupPage />} />
+      </Routes>
+    </div>
   );
 }
 
-export default App;
+function AppWrapper() {
+  const router = createBrowserRouter([
+    {
+      path: "/*",
+      element: <App />,
+    },
+  ]);
+
+  return <RouterProvider router={router} />;
+}
+
+export default AppWrapper;
