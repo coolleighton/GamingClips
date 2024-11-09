@@ -10,7 +10,12 @@ function App() {
   const [backendData, setBackendData] = useState<backendData>({ users: [] });
 
   useEffect(() => {
-    fetch(Url + "/api")
+    fetch(Url + "/api", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
@@ -21,6 +26,7 @@ function App() {
   return (
     <>
       <div>
+        <p>hello</p>
         {typeof backendData.users === "undefined" ? (
           <p>Loading...</p>
         ) : (

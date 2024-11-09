@@ -2,15 +2,16 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const frontendUrl = process.env.FRONTEND_URL;
 
 // CORS options
 var corsOptions = {
-  origin: frontendUrl,
+  origin: process.env.FRONTEND_URL,
+  optionSuccessStatus: 200,
 };
+
 app.use(cors(corsOptions));
 
-app.get("/api", (req, res) => {
+app.post("/api", (req, res) => {
   res.json({ users: ["firstUser", "secondUser"] });
 });
 
