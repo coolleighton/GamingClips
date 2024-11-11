@@ -3,6 +3,13 @@ import { useNavigate } from "react-router-dom";
 const googleClientId =
   "668090417329-r8v5g2khjctdq9o0ucp0levih650s62j.apps.googleusercontent.com";
 
+// defining google variable
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
 const LoginPage = () => {
   const navigate = useNavigate();
   //const [errorMessage, setLoginErrorMessage] = useState("");

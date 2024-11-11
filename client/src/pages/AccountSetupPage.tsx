@@ -6,6 +6,7 @@ interface backendData {
 }
 
 function AccountSetupPage() {
+  /*
   const [backendData, setBackendData] = useState<backendData>({ users: [] });
 
   useEffect(() => {
@@ -21,6 +22,7 @@ function AccountSetupPage() {
         setBackendData(data);
       });
   }, []);
+  */
 
   return (
     <>

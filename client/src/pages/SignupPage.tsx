@@ -2,6 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 const googleClientId = import.meta.env.GOOGLE_CLIENT_ID;
 
+// defining google variable
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
 const SignupPage = () => {
   const navigate = useNavigate();
   //const [errorMessage, setLoginErrorMessage] = useState("");
