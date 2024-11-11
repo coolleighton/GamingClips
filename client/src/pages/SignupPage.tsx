@@ -5,7 +5,25 @@ const googleClientId = import.meta.env.GOOGLE_CLIENT_ID;
 // defining google variable
 declare global {
   interface Window {
-    google: any;
+    google: {
+      accounts: {
+        id: {
+          initialize: (config: {
+            client_id: string;
+            callback: (response: any) => void;
+          }) => void;
+          renderButton: (
+            element: HTMLElement,
+            options: {
+              type?: "standard" | "icon";
+              theme?: "outline" | "filled";
+              size?: "large" | "medium" | "small";
+              width?: number;
+            }
+          ) => void;
+        };
+      };
+    };
   }
 }
 
@@ -32,7 +50,7 @@ const SignupPage = () => {
   useEffect(() => {
     const googleLoginButton = document.getElementById("googleSignIn");
     if (googleLoginButton) {
-      google.accounts.id.renderButton(googleLoginButton, {
+      window.google.accounts.id.renderButton(googleLoginButton, {
         type: "standard",
         theme: "outline",
         size: "large",
@@ -43,7 +61,7 @@ const SignupPage = () => {
 
   // initialise the google login button
   useEffect(() => {
-    google.accounts.id.initialize({
+    window.google.accounts.id.initialize({
       client_id: googleClientId,
       callback: logDone,
     });
