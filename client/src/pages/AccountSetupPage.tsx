@@ -26,15 +26,6 @@ function AccountSetupPage() {
     <>
       <div>
         <p>hello</p>
-        {typeof backendData.users === "undefined" ? (
-          <p>Loading...</p>
-        ) : (
-          backendData.users.map((user, i) => (
-            <p className="text-5xl font-black" key={i}>
-              {user}
-            </p>
-          ))
-        )}
       </div>
     </>
   );
