@@ -1,9 +1,11 @@
+/*
 import { useEffect, useState } from "react";
 const Url = import.meta.env.VITE_SERVER_URL;
 
 interface backendData {
   users: string[]; // This means users is an array of strings
 }
+  */
 
 function AccountSetupPage() {
   /*
