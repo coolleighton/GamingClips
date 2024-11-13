@@ -1,37 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-const googleClientId = import.meta.env.GOOGLE_CLIENT_ID;
-
-// defining google variable
-declare global {
-  interface Window {
-    google: {
-      accounts: {
-        id: {
-          initialize: (config: {
-            client_id: string;
-            callback: (response: any) => void;
-          }) => void;
-          renderButton: (
-            element: HTMLElement,
-            options: {
-              type?: "standard" | "icon";
-              theme?: "outline" | "filled";
-              size?: "large" | "medium" | "small";
-              width?: number;
-            }
-          ) => void;
-        };
-      };
-    };
-  }
-}
+const Url = import.meta.env.VITE_SERVER_URL;
 
 const SignupPage = () => {
   const navigate = useNavigate();
-  //const [errorMessage, setLoginErrorMessage] = useState("");
-  const errorMessage = "";
 
+  // declare states
+  const [errorMessage, setLoginErrorMessage] = useState("");
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -46,36 +21,10 @@ const SignupPage = () => {
     });
   };
 
-  // render google login button
-  useEffect(() => {
-    const googleLoginButton = document.getElementById("googleSignIn");
-    if (googleLoginButton) {
-      window.google.accounts.id.renderButton(googleLoginButton, {
-        type: "standard",
-        theme: "outline",
-        size: "large",
-        width: 500,
-      });
-    }
-  });
-
-  // initialise the google login button
-  useEffect(() => {
-    window.google.accounts.id.initialize({
-      client_id: googleClientId,
-      callback: logDone,
-    });
-  }, []);
-
-  const logDone = () => {
-    console.log("logging in");
-  };
-
-  /*
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(Url + "/auth/login", {
+      const response = await fetch(Url + "/users/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -84,14 +33,8 @@ const SignupPage = () => {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        const token = data.token;
-
-        // Save token to local storage
-        localStorage.setItem("token", token);
-        navigate("/");
-        window.location.reload();
+        console.log("sign up successful");
+        navigate("/login");
       } else {
         const data = await response.json();
         console.error("Error logging in");
@@ -99,11 +42,9 @@ const SignupPage = () => {
         setLoginErrorMessage(data.error);
       }
     } catch (error) {
-      console.error("Error logging in:", error.message);
+      console.error("Error logging in:");
     }
   };
-
-  */
 
   return (
     <div>
@@ -113,7 +54,7 @@ const SignupPage = () => {
             Sign up to GamingClips
           </h1>
 
-          <form className=" sm:w-[25rem]">
+          <form className=" sm:w-[25rem]" onSubmit={handleSubmit}>
             <div
               className="pb-4"
               style={{ display: errorMessage ? "block" : "hidden" }}
@@ -151,7 +92,7 @@ const SignupPage = () => {
               <input
                 className="block mb-2 w-full px-1 py-1 bg-gray-950 text-white"
                 name="email"
-                placeholder="example@123.com"
+                placeholder="example@gmail.com"
                 type="email"
                 onChange={handleChange}
                 value={formData.email}
@@ -171,7 +112,7 @@ const SignupPage = () => {
               <input
                 className="block mb-2 w-full px-1 py-1 bg-gray-950 text-white"
                 name="password"
-                placeholder="Password"
+                placeholder="examplePassword123"
                 type="password"
                 onChange={handleChange}
                 value={formData.password}
@@ -184,11 +125,6 @@ const SignupPage = () => {
             <button className="w-full bg-white font-semibold text-black py-2 rounded bold hover:bg-gray-300 duration-200 ">
               Sign Up
             </button>
-
-            <div className="flex justify-center w-full">
-              <p className="my-4 text-xs text-white">Or</p>
-            </div>
-            <div id="googleSignIn"></div>
           </form>
           <div className="flex w-full justify-center">
             <button
@@ -196,7 +132,7 @@ const SignupPage = () => {
               onClick={() => {
                 navigate("/login");
               }}
-              className="text-sm text-gray-300 mt-3 hover:text-white"
+              className="text-sm text-gray-300 mt-6 hover:text-white"
             >
               Already have an account? Log in
             </button>{" "}

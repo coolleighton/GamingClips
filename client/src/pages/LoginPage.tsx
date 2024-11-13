@@ -1,38 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-const googleClientId =
-  "668090417329-r8v5g2khjctdq9o0ucp0levih650s62j.apps.googleusercontent.com";
-
-// defining google variable
-declare global {
-  interface Window {
-    google: {
-      accounts: {
-        id: {
-          initialize: (config: {
-            client_id: string;
-            callback: (response: any) => void;
-          }) => void;
-          renderButton: (
-            element: HTMLElement,
-            options: {
-              type?: "standard" | "icon";
-              theme?: "outline" | "filled";
-              size?: "large" | "medium" | "small";
-              width?: number;
-            }
-          ) => void;
-        };
-      };
-    };
-  }
-}
+const Url = import.meta.env.VITE_SERVER_URL;
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  //const [errorMessage, setLoginErrorMessage] = useState("");
-  const errorMessage = "";
 
+  // declare states
+  const [errorMessage, setLoginErrorMessage] = useState("");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -46,36 +20,10 @@ const LoginPage = () => {
     });
   };
 
-  // render google login button
-  useEffect(() => {
-    const googleLoginButton = document.getElementById("googleSignIn");
-    if (googleLoginButton) {
-      window.google.accounts.id.renderButton(googleLoginButton, {
-        type: "standard",
-        theme: "outline",
-        size: "large",
-        width: 500,
-      });
-    }
-  });
-
-  // initialise the google login button
-  useEffect(() => {
-    window.google.accounts.id.initialize({
-      client_id: googleClientId,
-      callback: logDone,
-    });
-  }, []);
-
-  const logDone = () => {
-    console.log("logging in");
-  };
-
-  /*
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(Url + "/auth/login", {
+      const response = await fetch(Url + "/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -85,13 +33,11 @@ const LoginPage = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         const token = data.token;
+        console.log(token);
 
         // Save token to local storage
         localStorage.setItem("token", token);
-        navigate("/");
-        window.location.reload();
       } else {
         const data = await response.json();
         console.error("Error logging in");
@@ -99,11 +45,9 @@ const LoginPage = () => {
         setLoginErrorMessage(data.error);
       }
     } catch (error) {
-      console.error("Error logging in:", error.message);
+      console.error("Error logging in:");
     }
   };
-
-  */
 
   return (
     <div>
@@ -112,7 +56,7 @@ const LoginPage = () => {
           <h1 className="text-center font-semibold text-2xl mb-8 text-white">
             Log in to GamingClips
           </h1>
-          <form className=" sm:w-[25rem]">
+          <form className="sm:w-[25rem]" onSubmit={handleSubmit}>
             <div
               className="pb-4"
               style={{ display: errorMessage ? "block" : "hidden" }}
@@ -156,13 +100,8 @@ const LoginPage = () => {
             <hr className="mb-8"></hr>
 
             <button className="w-full bg-white font-semibold text-black py-2 rounded bold hover:bg-gray-300 duration-200 ">
-              Login
+              Log in
             </button>
-
-            <div className="flex justify-center w-full">
-              <p className="my-4 text-xs text-white">Or</p>
-            </div>
-            <div id="googleSignIn"></div>
           </form>
           <div className="flex w-full justify-center ">
             <button
@@ -170,7 +109,7 @@ const LoginPage = () => {
               onClick={() => {
                 navigate("/signup");
               }}
-              className="text-sm text-gray-300 mt-3 hover:text-white"
+              className="text-sm text-gray-300 mt-6 hover:text-white"
             >
               Dont have an account? Sign Up
             </button>{" "}
