@@ -8,13 +8,21 @@ const cors = require("cors");
 
 const usersRoutes = require("./routes/usersRoutes");
 
-// CORS options
-var corsOptions = {
-  origin: process.env.FRONTEND_URL,
-  optionSuccessStatus: 200,
-};
+// set CORS/Headers
+app.use(function (req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", process.env.FRONTEND_URL);
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-Requested-With, content-type, Authorization"
+  );
+  res.setHeader("Access-Control-Allow-Credentials", true);
 
-app.use(cors(corsOptions));
+  next();
+});
 
 // Set up rate limiter: maximum of twenty requests per minute
 const limiter = RateLimit({

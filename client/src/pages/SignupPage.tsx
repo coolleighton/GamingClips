@@ -42,7 +42,7 @@ const SignupPage = () => {
         setLoginErrorMessage(data.error);
       }
     } catch (error) {
-      console.error("Error logging in:");
+      console.error("Error signing up:");
     }
   };
 
