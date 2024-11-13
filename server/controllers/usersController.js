@@ -44,7 +44,7 @@ exports.loginPost = [
       if (!user) {
         return res.status(404).json({
           error:
-            "This email address was not found. Try a different email or sign up.",
+            "The crednetials you entered were incorrect. Try a different email/password or sign up.",
         });
       }
 
@@ -52,7 +52,7 @@ exports.loginPost = [
       if (!match) {
         return res.status(404).json({
           error:
-            "This password was incorrect. Try a different password or try to login using your google account.",
+            "The crednetials you entered were incorrect. Try a different email/password or sign up.",
         });
       }
 

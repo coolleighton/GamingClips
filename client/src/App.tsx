@@ -13,7 +13,6 @@ import SignupPage from "./pages/SignupPage";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
-  console.log(loggedIn);
 
   // Check if the user is logged in by sending a request to the backend, if logged in get user data
   useEffect(() => {
@@ -41,13 +40,16 @@ function App() {
     };
 
     CheckAuth();
-  }, []);
+  }, [loggedIn]);
 
   return (
     <div>
       <Routes>
         <Route path="/" element={<AccountSetupPage />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/login"
+          element={<LoginPage setLoggedIn={setLoggedIn} />}
+        />
         <Route path="/signup" element={<SignupPage />} />
       </Routes>
     </div>

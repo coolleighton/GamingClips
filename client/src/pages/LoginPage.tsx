@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 const Url = import.meta.env.VITE_SERVER_URL;
 
-const LoginPage = () => {
+interface LoginPageProps {
+  setLoggedIn: (value: boolean) => void;
+}
+
+const LoginPage = ({ setLoggedIn }: LoginPageProps) => {
   const navigate = useNavigate();
 
   // declare states
@@ -35,6 +39,7 @@ const LoginPage = () => {
         const data = await response.json();
         const token = data.token;
         console.log(token);
+        setLoggedIn(true);
 
         // Save token to local storage
         localStorage.setItem("token", token);
