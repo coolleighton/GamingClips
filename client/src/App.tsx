@@ -13,6 +13,7 @@ import SignupPage from "./pages/SignupPage";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
+  console.log(loggedIn);
 
   // Check if the user is logged in by sending a request to the backend, if logged in get user data
   useEffect(() => {
