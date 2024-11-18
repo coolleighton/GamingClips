@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserData } from "../types/user";
 const Url = import.meta.env.VITE_SERVER_URL;
 
 interface LoginPageProps {
   setLoggedIn: (value: boolean) => void;
+  setUserData: (value: UserData | null) => void;
 }
 
-const LoginPage = ({ setLoggedIn }: LoginPageProps) => {
+const LoginPage = ({ setLoggedIn, setUserData }: LoginPageProps) => {
   const navigate = useNavigate();
 
   // declare states
@@ -37,11 +39,17 @@ const LoginPage = ({ setLoggedIn }: LoginPageProps) => {
 
       if (response.ok) {
         const data = await response.json();
-        const token = data.token;
-        console.log(token);
+        setUserData(data.userData);
         setLoggedIn(true);
 
+        if (!data.userData.accountSetup) {
+          navigate("/submitfirstvideo");
+        } else {
+          //navigate to main app
+        }
+
         // Save token to local storage
+        const token = data.token;
         localStorage.setItem("token", token);
       } else {
         const data = await response.json();

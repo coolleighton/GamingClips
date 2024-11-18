@@ -4,15 +4,19 @@ import {
   Routes,
   Route,
 } from "react-router-dom";
-import { useState, useEffect } from "react";
 import "./App.css";
+import { useState, useEffect } from "react";
+import { UserData } from "./types/user";
 const Url = import.meta.env.VITE_SERVER_URL;
-import AccountSetupPage from "./pages/AccountSetupPage";
+import SubmitFirstVideoPage from "./pages/SubmitFirstVideoPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
+  const [userData, setUserData] = useState<UserData | null>(null);
+
+  console.log(userData);
 
   // Check if the user is logged in by sending a request to the backend, if logged in get user data
   useEffect(() => {
@@ -30,6 +34,7 @@ function App() {
         if (response.ok) {
           const data = await response.json();
           console.log("user logged in", data);
+
           setLoggedIn(true);
         } else {
           console.error("Error checking auth");
@@ -42,13 +47,31 @@ function App() {
     CheckAuth();
   }, [loggedIn]);
 
+  // handle logout
+  const handleLogout = () => {
+    console.log("clicked");
+    localStorage.clear();
+    setLoggedIn(false);
+  };
+
   return (
     <div>
       <Routes>
-        <Route path="/" element={<AccountSetupPage />} />
+        <Route path="/" element={<SignupPage />} />
+        <Route
+          path="/submitfirstvideo"
+          element={
+            <SubmitFirstVideoPage
+              handleLogout={handleLogout}
+              loggedIn={loggedIn}
+            />
+          }
+        />
         <Route
           path="/login"
-          element={<LoginPage setLoggedIn={setLoggedIn} />}
+          element={
+            <LoginPage setLoggedIn={setLoggedIn} setUserData={setUserData} />
+          }
         />
         <Route path="/signup" element={<SignupPage />} />
       </Routes>

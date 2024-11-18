@@ -24,6 +24,7 @@ exports.signupPost = [
           email: req.body.email,
           username: req.body.username,
           password: hashedPassword,
+          accountSetup: false,
         });
 
         const result = await user.save();
@@ -63,6 +64,7 @@ exports.loginPost = [
         (err, token) => {
           res.json({
             token: token,
+            userData: user,
           });
         }
       );
@@ -75,13 +77,13 @@ exports.loginPost = [
 exports.checkAuthPost = [
   verifyToken,
   (req, res) => {
-    jwt.verify(req.token, JwtSecretKey, (err, authData) => {
+    jwt.verify(req.token, JwtSecretKey, (err, userData) => {
       if (err) {
         res.sendStatus(403);
       } else {
         res.json({
           message: "logged in...",
-          authData,
+          userData,
         });
       }
     });
