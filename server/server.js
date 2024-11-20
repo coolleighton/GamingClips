@@ -4,8 +4,11 @@ const app = express();
 const RateLimit = require("express-rate-limit");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const cors = require("cors");
+const fileUpload = require("express-fileupload");
+const cloudinary = require("./cloudinaryConfig");
 
+// Routes
+const videosRoutes = require("./routes/videosRoutes");
 const usersRoutes = require("./routes/usersRoutes");
 
 // set CORS/Headers
@@ -43,13 +46,23 @@ app.use(bodyParser.json());
 mongoose.set("strictQuery", false);
 const mongoDB = process.env.MONGO_URL;
 
+// set app to use express-fileupload
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+    limits: { fileSize: 500 * 1024 * 1024 }, // 500MB/0.5GB limit
+  })
+);
+
 main().catch((err) => console.log(err));
 async function main() {
   await mongoose.connect(mongoDB);
 }
 
-// Routes
+// Set Routes
 app.use("/users", usersRoutes);
+app.use("/videos", videosRoutes);
 
 app.post("/api", (req, res) => {
   res.json({ users: ["firstUser", "secondUser"] });

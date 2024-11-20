@@ -6,7 +6,7 @@ const JwtSecretKey = process.env.JWT_SECRET_KEY;
 
 exports.signupPost = [
   async (req, res, next) => {
-    console.log(req.body);
+    console.log("Tried signing up");
     bcrypt.hash(req.body.password, 10, async (err, hashedPassword) => {
       if (err) {
         console.log("unable to hash");
@@ -25,6 +25,7 @@ exports.signupPost = [
           username: req.body.username,
           password: hashedPassword,
           accountSetup: false,
+          videos: [],
         });
 
         const result = await user.save();
@@ -39,7 +40,7 @@ exports.signupPost = [
 
 exports.loginPost = [
   async (req, res, next) => {
-    console.log("tried loggin in");
+    console.log("tried logging in");
     try {
       const user = await User.findOne({ email: req.body.email });
       if (!user) {
