@@ -39,10 +39,10 @@ const LoginPage = ({ setLoggedIn, setUserData }: LoginPageProps) => {
 
       if (response.ok) {
         const data = await response.json();
-        setUserData(data.userData);
+        setUserData(data.user);
         setLoggedIn(true);
 
-        if (!data.userData.accountSetup) {
+        if (!data.user.accountSetup) {
           navigate("/submitfirstvideo");
         } else {
           //navigate to main app

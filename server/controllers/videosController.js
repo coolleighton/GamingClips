@@ -1,15 +1,19 @@
 const User = require("../models/userModel");
 const cloudinary = require("../cloudinaryConfig");
+const fs = require("fs");
+const util = require("util");
+const unlinkFile = util.promisify(fs.unlink);
 
 exports.uploadPost = async (req, res) => {
+  let tempFilePath = null;
+
   try {
+    console.log("Starting upload process");
+
     // Verify user exists and account is setup
     const user = await User.findById(req.body.userId);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
-    }
-    if (!user.accountSetup) {
-      return res.status(403).json({ error: "Account setup not completed" });
     }
 
     // Check if a file was uploaded
@@ -18,61 +22,76 @@ exports.uploadPost = async (req, res) => {
     }
 
     const videoFile = req.files.video;
+    tempFilePath = videoFile.tempFilePath;
 
-    // Validate file type
-    if (!videoFile.mimetype.startsWith("video/")) {
-      return res.status(400).json({ error: "File must be a video" });
-    }
+    console.log("File details:", {
+      size: videoFile.size,
+      mimetype: videoFile.mimetype,
+      name: videoFile.name,
+      tempFilePath: videoFile.tempFilePath,
+    });
 
-    // Validate file size (max 500MB)
-    const maxSize = 500 * 1024 * 1024;
-    if (videoFile.size > maxSize) {
-      return res
-        .status(400)
-        .json({ error: "File size must be less than 500MB" });
-    }
+    // Simpler upload options
+    const uploadOptions = {
+      resource_type: "video",
+      folder: "gaming_clips",
+      public_id: `video_${Date.now()}`, // Ensure unique filename
+    };
 
-    // Validate title
-    if (
-      !req.body.title ||
-      req.body.title.length < 1 ||
-      req.body.title.length > 100
-    ) {
-      return res
-        .status(400)
-        .json({ error: "Title must be between 1 and 100 characters" });
-    }
-
-    // Upload to Cloudinary
+    console.log("Starting Cloudinary upload...");
     const cloudinaryResponse = await cloudinary.uploader.upload(
       videoFile.tempFilePath,
-      {
-        resource_type: "video",
-        folder: "gaming_clips",
-        eager: [{ quality: "auto", fetch_format: "auto" }],
-        eager_async: true,
-      }
+      uploadOptions
     );
+    console.log("Cloudinary upload complete", cloudinaryResponse);
 
-    // Create new video object
-    const newVideo = {
-      title: req.body.title,
+    // Update user's videos array
+    user.videos.push({
+      title: req.body.title || videoFile.name,
       url: cloudinaryResponse.secure_url,
       cloudinaryId: cloudinaryResponse.public_id,
       uploadDate: new Date(),
-    };
+    });
 
-    // Add video to user's videos array
-    user.videos.push(newVideo);
     await user.save();
+
+    // Clean up temp file
+    if (tempFilePath && fs.existsSync(tempFilePath)) {
+      await unlinkFile(tempFilePath);
+    }
 
     res.status(200).json({
       message: "Video uploaded successfully",
-      video: newVideo,
+      video: {
+        title: req.body.title || videoFile.name,
+        url: cloudinaryResponse.secure_url,
+        uploadDate: new Date(),
+      },
     });
   } catch (error) {
-    console.error("Upload error:", error);
-    res.status(500).json({ error: "Error uploading video" });
+    console.error("Upload error full details:", error);
+
+    // Clean up temp file if it exists
+    if (tempFilePath && fs.existsSync(tempFilePath)) {
+      try {
+        await unlinkFile(tempFilePath);
+      } catch (unlinkError) {
+        console.error("Error deleting temp file:", unlinkError);
+      }
+    }
+
+    // More detailed error response
+    let errorMessage = "Error uploading video";
+    if (error.http_code === 413) {
+      errorMessage = "File size exceeds limit. Please try a smaller file.";
+    } else if (error.error && error.error.message) {
+      errorMessage = error.error.message;
+    }
+
+    res.status(500).json({
+      error: errorMessage,
+      details: error.message || "Unknown error occurred",
+    });
   }
 };
 

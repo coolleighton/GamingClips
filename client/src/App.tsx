@@ -16,8 +16,6 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [userData, setUserData] = useState<UserData | null>(null);
 
-  console.log(userData);
-
   // Check if the user is logged in by sending a request to the backend, if logged in get user data
   useEffect(() => {
     const CheckAuth = async () => {
@@ -35,12 +33,23 @@ function App() {
           const data = await response.json();
           console.log("user logged in", data);
 
-          setLoggedIn(true);
+          if (data.user) {
+            setUserData(data.user);
+            setLoggedIn(true);
+          } else {
+            console.error("User data missing");
+            setLoggedIn(false);
+            localStorage.removeItem("token");
+          }
         } else {
           console.error("Error checking auth");
+          setLoggedIn(false);
+          localStorage.removeItem("token");
         }
       } catch (error) {
-        console.error("Error checking auth:");
+        console.error("Error checking auth:", error);
+        setLoggedIn(false);
+        localStorage.removeItem("token");
       }
     };
 
@@ -64,6 +73,7 @@ function App() {
             <SubmitFirstVideoPage
               handleLogout={handleLogout}
               loggedIn={loggedIn}
+              userId={userData?._id || ""}
             />
           }
         />

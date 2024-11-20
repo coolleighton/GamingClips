@@ -11,6 +11,27 @@ const cloudinary = require("./cloudinaryConfig");
 const videosRoutes = require("./routes/videosRoutes");
 const usersRoutes = require("./routes/usersRoutes");
 
+// Body parser configurations
+app.use(express.json({ limit: "500mb" }));
+app.use(express.urlencoded({ extended: true, limit: "500mb" }));
+app.use(express.raw({ limit: "500mb" }));
+
+// File upload configuration
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+    limits: {
+      fileSize: 500 * 1024 * 1024, // 500MB
+    },
+    abortOnLimit: true,
+    responseOnLimit: "File size is too large",
+    uploadTimeout: 0, // Disable timeout
+    parseNested: true,
+    debug: true, // Enable debug mode
+  })
+);
+
 // set CORS/Headers
 app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", process.env.FRONTEND_URL);
@@ -36,24 +57,9 @@ const limiter = RateLimit({
 
 app.use(limiter); // Apply rate limiter to all requests
 
-// apply options for body parser and express
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
 // connect to mongoDB
 mongoose.set("strictQuery", false);
 const mongoDB = process.env.MONGO_URL;
-
-// set app to use express-fileupload
-app.use(
-  fileUpload({
-    useTempFiles: true,
-    tempFileDir: "/tmp/",
-    limits: { fileSize: 500 * 1024 * 1024 }, // 500MB/0.5GB limit
-  })
-);
 
 main().catch((err) => console.log(err));
 async function main() {

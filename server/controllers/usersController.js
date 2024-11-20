@@ -4,22 +4,34 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const JwtSecretKey = process.env.JWT_SECRET_KEY;
 
+// Helper function to format user data consistently
+const formatUserData = (user) => ({
+  _id: user._id,
+  email: user.email,
+  username: user.username,
+  accountSetup: user.accountSetup,
+  videos: user.videos,
+});
+
 exports.signupPost = [
   async (req, res, next) => {
     console.log("Tried signing up");
     bcrypt.hash(req.body.password, 10, async (err, hashedPassword) => {
       if (err) {
         console.log("unable to hash");
+        return res.status(500).json({ error: "Password hashing failed" });
       }
-      const user = await User.findOne({ email: req.body.email });
-      if (user) {
-        return res.status(404).json({
-          error:
-            "This email address is already associated with an account. Try a different email or try to login.",
-          isUser: true,
-        });
-      }
+
       try {
+        const existingUser = await User.findOne({ email: req.body.email });
+        if (existingUser) {
+          return res.status(404).json({
+            error:
+              "This email address is already associated with an account. Try a different email or try to login.",
+            isUser: true,
+          });
+        }
+
         const user = new User({
           email: req.body.email,
           username: req.body.username,
@@ -29,9 +41,12 @@ exports.signupPost = [
         });
 
         const result = await user.save();
-        res.sendStatus(201);
+
+        res.status(201).json({
+          user: formatUserData(result),
+        });
       } catch (err) {
-        res.sendStatus(500);
+        res.status(500).json({ error: "Error creating user" });
         return next(err);
       }
     });
@@ -46,7 +61,7 @@ exports.loginPost = [
       if (!user) {
         return res.status(404).json({
           error:
-            "The crednetials you entered were incorrect. Try a different email/password or sign up.",
+            "The credentials you entered were incorrect. Try a different email/password or sign up.",
         });
       }
 
@@ -54,22 +69,28 @@ exports.loginPost = [
       if (!match) {
         return res.status(404).json({
           error:
-            "The crednetials you entered were incorrect. Try a different email/password or sign up.",
+            "The credentials you entered were incorrect. Try a different email/password or sign up.",
         });
       }
 
+      const userData = formatUserData(user);
+
       jwt.sign(
-        { user: user },
+        { user: userData }, // Only include necessary user data in token
         JwtSecretKey,
-        { expiresIn: "5m" },
+        { expiresIn: "24hr" },
         (err, token) => {
+          if (err) {
+            return res.status(500).json({ error: "Error generating token" });
+          }
           res.json({
             token: token,
-            userData: user,
+            user: userData, // Send formatted user data
           });
         }
       );
     } catch (err) {
+      res.status(500).json({ error: "Login failed" });
       return next(err);
     }
   },
@@ -77,15 +98,25 @@ exports.loginPost = [
 
 exports.checkAuthPost = [
   verifyToken,
-  (req, res) => {
-    jwt.verify(req.token, JwtSecretKey, (err, userData) => {
+  async (req, res) => {
+    jwt.verify(req.token, JwtSecretKey, async (err, authData) => {
       if (err) {
-        res.sendStatus(403);
-      } else {
+        return res.sendStatus(403);
+      }
+
+      try {
+        // Fetch fresh user data from database
+        const user = await User.findById(authData.user._id);
+        if (!user) {
+          return res.status(404).json({ error: "User not found" });
+        }
+
         res.json({
           message: "logged in...",
-          userData,
+          user: formatUserData(user), // Send formatted user data
         });
+      } catch (err) {
+        res.status(500).json({ error: "Error fetching user data" });
       }
     });
   },
@@ -93,20 +124,15 @@ exports.checkAuthPost = [
 
 // Verify Token
 function verifyToken(req, res, next) {
-  // Get auth header value
   const bearerHeader = req.headers["authorization"];
-  // Check if bearer is undefined
   if (typeof bearerHeader !== "undefined") {
-    // Split at the space
     const bearer = bearerHeader.split(" ");
-    // Get token from array
     const bearerToken = bearer[1];
-    // Set the token
     req.token = bearerToken;
-    // Next middleware
     next();
   } else {
-    // Forbidden
     res.sendStatus(403);
   }
 }
+
+module.exports = exports;
