@@ -8,12 +8,14 @@ interface SubmitFirstVideoPageProps {
   handleLogout: () => void;
   loggedIn: boolean;
   userId: string;
+  setUserData?: (data: any) => void; // Add this prop
 }
 
 function SubmitFirstVideoPage({
   handleLogout,
   loggedIn,
   userId,
+  setUserData,
 }: SubmitFirstVideoPageProps) {
   const navigate = useNavigate();
   const [fileName, setFileName] = useState<string>("");
@@ -25,7 +27,32 @@ function SubmitFirstVideoPage({
   useEffect(() => {
     if (!loggedIn) {
       navigate("/login");
+      return;
     }
+
+    // Check if user already has videos
+    const checkForVideos = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(Url + "/users/checkAuth", {
+          method: "POST",
+          headers: {
+            authorization: "Bearer " + token,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.user && data.user.videos && data.user.videos.length > 0) {
+            navigate("/cropfirstvideo");
+          }
+        }
+      } catch (error) {
+        console.error("Error checking for videos:", error);
+      }
+    };
+
+    checkForVideos();
   }, [loggedIn, navigate]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,6 +114,23 @@ function SubmitFirstVideoPage({
 
       if (data) {
         console.log("Upload successful:", data);
+
+        // Fetch updated user data after successful upload
+        const token = localStorage.getItem("token");
+        const userResponse = await fetch(Url + "/users/checkAuth", {
+          method: "POST",
+          headers: {
+            authorization: "Bearer " + token,
+          },
+        });
+
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          if (userData.user && setUserData) {
+            setUserData(userData.user); // Update parent state with new user data
+          }
+        }
+
         navigate("/cropfirstvideo");
       }
     } catch (err) {
