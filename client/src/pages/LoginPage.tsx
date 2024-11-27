@@ -9,7 +9,7 @@ interface LoginPageProps {
   loggedIn: boolean;
 }
 
-const LoginPage = ({ setLoggedIn, setUserData, loggedIn }: LoginPageProps) => {
+function LoginPage({ setLoggedIn, setUserData, loggedIn }: LoginPageProps) {
   const navigate = useNavigate();
 
   // declare states
@@ -140,6 +140,6 @@ const LoginPage = ({ setLoggedIn, setUserData, loggedIn }: LoginPageProps) => {
       </div>
     </div>
   );
-};
+}
 
 export default LoginPage;

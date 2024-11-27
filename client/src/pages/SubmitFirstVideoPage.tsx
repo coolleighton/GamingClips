@@ -84,7 +84,11 @@ function SubmitFirstVideoPage({
       }
 
       const data = await response.json();
-      console.log("Upload successful:", data);
+
+      if (data) {
+        console.log("Upload successful:", data);
+        navigate("/cropfirstvideo");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {

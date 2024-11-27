@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { UserData } from "./types/user";
 const Url = import.meta.env.VITE_SERVER_URL;
 import SubmitFirstVideoPage from "./pages/SubmitFirstVideoPage";
+import CropFirstVideoPage from "./pages/CropFirstVideoPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 
@@ -67,6 +68,7 @@ function App() {
     <div>
       <Routes>
         <Route path="/" element={<SignupPage loggedIn={loggedIn} />} />
+        <Route path="/cropfirstvideo" element={<CropFirstVideoPage />} />
         <Route
           path="/submitfirstvideo"
           element={
