@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserData } from "../types/user";
 const Url = import.meta.env.VITE_SERVER_URL;
@@ -6,9 +6,10 @@ const Url = import.meta.env.VITE_SERVER_URL;
 interface LoginPageProps {
   setLoggedIn: (value: boolean) => void;
   setUserData: (value: UserData | null) => void;
+  loggedIn: boolean;
 }
 
-const LoginPage = ({ setLoggedIn, setUserData }: LoginPageProps) => {
+const LoginPage = ({ setLoggedIn, setUserData, loggedIn }: LoginPageProps) => {
   const navigate = useNavigate();
 
   // declare states
@@ -17,6 +18,13 @@ const LoginPage = ({ setLoggedIn, setUserData }: LoginPageProps) => {
     email: "",
     password: "",
   });
+
+  // if logged in navigate to account
+  useEffect(() => {
+    if (loggedIn) {
+      navigate("/submitfirstvideo");
+    }
+  }, [loggedIn]);
 
   // on input field change, set 'formData' to value of input field
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,6 +50,7 @@ const LoginPage = ({ setLoggedIn, setUserData }: LoginPageProps) => {
         setUserData(data.user);
         setLoggedIn(true);
 
+        // will be used once we have a full account setup process
         if (!data.user.accountSetup) {
           navigate("/submitfirstvideo");
         } else {

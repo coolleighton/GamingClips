@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 const Url = import.meta.env.VITE_SERVER_URL;
 
-const SignupPage = () => {
+interface SignupPageProps {
+  loggedIn: boolean;
+}
+
+function SignupPage({ loggedIn }: SignupPageProps) {
   const navigate = useNavigate();
 
   // declare states
@@ -12,6 +16,13 @@ const SignupPage = () => {
     email: "",
     password: "",
   });
+
+  // if logged in navigate to account
+  useEffect(() => {
+    if (loggedIn) {
+      navigate("/submitfirstvideo");
+    }
+  }, [loggedIn]);
 
   // on input field change, set 'formData' to value of input field
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -141,6 +152,6 @@ const SignupPage = () => {
       </div>
     </div>
   );
-};
+}
 
 export default SignupPage;

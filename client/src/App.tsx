@@ -66,7 +66,7 @@ function App() {
   return (
     <div>
       <Routes>
-        <Route path="/" element={<SignupPage />} />
+        <Route path="/" element={<SignupPage loggedIn={loggedIn} />} />
         <Route
           path="/submitfirstvideo"
           element={
@@ -80,10 +80,14 @@ function App() {
         <Route
           path="/login"
           element={
-            <LoginPage setLoggedIn={setLoggedIn} setUserData={setUserData} />
+            <LoginPage
+              setLoggedIn={setLoggedIn}
+              setUserData={setUserData}
+              loggedIn={loggedIn}
+            />
           }
         />
-        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/signup" element={<SignupPage loggedIn={loggedIn} />} />
       </Routes>
     </div>
   );

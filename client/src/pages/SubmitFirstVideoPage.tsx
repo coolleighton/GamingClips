@@ -148,12 +148,7 @@ function SubmitFirstVideoPage({
 
             <button
               type="submit"
-              disabled={isUploading || !file}
-              className={`mt-4 bg-white px-6 h-12 w-full rounded-xl flex justify-center items-center duration-200 ${
-                isUploading || !file
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:opacity-80"
-              }`}
+              className="mt-4 bg-white px-6 h-12 w-full rounded-xl flex justify-center items-center duration-200 hover:opacity-80"
             >
               <p className="font-semibold text-lg mr-2">
                 {isUploading ? "Uploading..." : "Get clips"}
